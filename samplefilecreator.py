@@ -3,6 +3,7 @@
 import argparse
 import textwrap
 import os
+import subprocess
 from sys import argv
 from PIL import Image
 
@@ -102,6 +103,26 @@ def resize_images(path, dir_path, filenames, new_size):
 
     print("\tFinished resizing.")
 
+def create_samples(filenames, num, width, height, maxxangle, maxyangle, maxzangle, path):
+    print("[*] Creating samples...")
+    path_to_bg = path + "bg.txt"
+    path_to_vecs = path + "vec_files/"
+
+    print("\tCurrent dir is:", path)
+    print("\tChecking for vec dir:", path_to_vecs)
+    if not os.path.exists(path_to_vecs):
+        print("\tCreate new dir:", path_to_vecs)
+        os.makedirs(path_to_vecs)
+
+    for filename in filenames:
+        path_to_img = path + "pos_resized/" + filename
+        vec_filename = (filename.split(".")[0]) + ".vec"
+        vec_filename_path = path_to_vecs + vec_filename
+
+        print("\t", filename, "-->", vec_filename)
+
+        subprocess.call(["opencv_createsamples", "-img", path_to_img, "-num", str(num), "-bg", path_to_bg, "-vec", vec_filename_path, "-w", str(width), "-h", str(height), "-maxxangle", str(maxxangle), "-maxyangle", str(maxyangle), "-maxzangle", str(maxzangle)])
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(add_help=False, formatter_class=argparse.RawDescriptionHelpFormatter, description=textwrap.dedent('''\
         Directory structure:
@@ -112,6 +133,12 @@ if __name__ == "__main__":
                 /pos
                     img1.jpg
                     img2.jpg
+                /vec_files
+                    1.vec
+                    2.vec
+                    out.vec
+                bg.txt
+                info.dat
         '''))
     parser.add_argument("--help", action="help", help="show this help message and exit")
     parser.add_argument("-p", "--path", nargs="?", default=os.getcwd(), type=str, help="path to dir to process or current path of script is used")
@@ -122,6 +149,11 @@ if __name__ == "__main__":
     parser.add_argument("-w", "--width", nargs="?", default=0, type=int, help="width of resized images")
     parser.add_argument("-h", "--height", nargs="?", default=0, type=int, help="height of resized images")
     parser.add_argument("-m", "--mean", action="store_true", help="use mean size of old images for resized images")
+    parser.add_argument("-v", "--vec", action="store_true", help="create a vec file of all pos images with using all neg images, mergevec.py needed")
+    parser.add_argument("--num", nargs="?", default=100, type=int, help="number_of_samples, 100 is default")
+    parser.add_argument("-mx", "--maxxangle", nargs="?", default=0, type=float, help="max_x_rotation_angle, default is 1.0")
+    parser.add_argument("-my", "--maxyangle", nargs="?", default=0, type=float, help="max_y_rotation_angle, default is 1.0")
+    parser.add_argument("-mz", "--maxzangle", nargs="?", default=0, type=float, help="max_z_rotation_angle, default is 0.1")
 
     parser.print_help()
     args = parser.parse_args()
@@ -157,3 +189,6 @@ if __name__ == "__main__":
 
         if ((width is not 0) and (height is not 0)):
             resize_images(path, dir_path, filenames, (width, height))
+
+    if args.vec:
+        create_samples(filenames, args.num, width, height, args.maxxangle, args.maxyangle, args.maxzangle, path)
