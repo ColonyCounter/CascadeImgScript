@@ -8,7 +8,7 @@ Currently the script assumes the dir structure you see below.
 
 ## General Usage
 
-```
+```bash
 $ python samplefilecreator.py
 usage: samplefilecreator.py [--help] [-p [PATH]] [--jpg] [--png] [--neg]
                             [--pos] [-w [WIDTH]] [-h [HEIGHT]] [-m] [-v]
@@ -57,7 +57,7 @@ optional arguments:
 ```
 
 ## Usage Examples
-```
+```bash
 # Generate the info.dat file in the same dir
 $ python samplefilcreator.py
 
