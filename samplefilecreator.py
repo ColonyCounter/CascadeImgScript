@@ -18,18 +18,19 @@ def create_bg_file(path, filenames):
             f.write(str_to_write)
             print("\tAdded: ", str_to_write, end="")
 
-def create_positive_file(path, filenames):
+def create_positive_file(path, relative_path, filenames):
+    # relative_path is pos/ or pos_resized/ so we now if we have just resized the images and link to them in info.dat
     print("[*] Creating positive file...")
     print("\tAssuming object covers the whole picture and just one object...")
 
     # only add if it contains just one object!
+    img_path = path + relative_path
     file_path = path + "info.dat"
-    img_path = path + "pos/"
     with open(file_path, "w") as f:
         for img in filenames:
             next_img = img_path + img
             size = get_image_size(next_img)
-            str_to_write = "pos/" + img + " 1" + " 0 0 " + str(size[0]) + " " + str(size[1]) + "\n"
+            str_to_write = relative_path + img + " 1" + " 0 0 " + str(size[0]) + " " + str(size[1]) + "\n"
 
             f.write(str_to_write)
             print("\tAdded: ", str_to_write, end="")
@@ -161,34 +162,39 @@ if __name__ == "__main__":
     path = args.path
     if not path.endswith("/"):
         path = path + "/"
+    relative_path = "pos/"
     width = args.width
     height = args.height
 
     if args.neg:
         dir_path = path + "neg/" # generate the bg file
     else:
-        dir_path = path + "pos/" # generate the info.dat file
+        if (width is 0) or (height is 0) or (not args.mean):
+            dir_path = path + "pos/" # generate the info.dat file
+        else:
+            dir_path = path + "pos_resized/"
 
     if args.png:
         filenames = get_all_png_files(dir_path)
     else:
         filenames = get_all_jpg_files(dir_path)
 
+    # only resize positive images
+    if (width is 0) or (height is 0):
+        if args.mean:
+            resize_size = get_mean_size(dir_path, filenames)
+            width = resize_size[0]
+            height = resize_size[1]
+
+    if ((width is not 0) and (height is not 0)):
+        resize_images(path, relative_path, filenames, (width, height))
+
+    relative_path = "pos_resized/"
+
     if args.neg:
         create_bg_file(path, filenames) # generate the bg file
     else:
-        create_positive_file(path, filenames) # generate the info.dat file
-
-    # only resize positive images
-    if args.pos:
-        if (width is 0) or (height is 0):
-            if args.mean:
-                resize_size = get_mean_size(dir_path, filenames)
-                width = resize_size[0]
-                height = resize_size[1]
-
-        if ((width is not 0) and (height is not 0)):
-            resize_images(path, dir_path, filenames, (width, height))
+        create_positive_file(path, relative_path, filenames) # generate the info.dat file
 
     if args.vec:
         create_samples(filenames, args.num, width, height, args.maxxangle, args.maxyangle, args.maxzangle, path)
