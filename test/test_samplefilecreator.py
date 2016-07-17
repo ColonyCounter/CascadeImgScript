@@ -18,13 +18,15 @@ class TestFunctions(unittest.TestCase):
         self.path_to_pos_resized_images = self.path_to_test_dir + "pos_resized/"
         self.path_to_one_image = self.path_to_pos_images + "1.jpg"
         self.path_to_vecs = self.path_to_test_dir + "vec/"
+        self.path_to_out_vec = self.path_to_test_dir + "out.vec"
 
     @classmethod
     def tearDownClass(self):
         # Delete the files created in pos_resized during the test
-        # we need to delete: info.dat, bg.txt, images in vec folder and pos_resized folder
+        # we need to delete: info.dat, bg.txt, out.vec, images in vec folder and pos_resized folder
         os.remove(self.path_to_info_file)
         os.remove(self.path_to_bg_file)
+        os.remove(self.path_to_out_vec)
 
         for filename in self.filenames_jpg:
             os.remove(self.path_to_pos_resized_images + filename)
@@ -101,6 +103,11 @@ class TestFunctions(unittest.TestCase):
         for filename in self.filenames_vec:
             path_to_file = self.path_to_vecs + filename
             self.assertTrue(os.path.isfile(path_to_file))
+
+    def test_merge_all_vecs(self):
+        script.merge_all_vecs(self.path_to_test_dir, "vec/")
+
+        self.assertTrue(os.path.isfile(self.path_to_out_vec))
 
 if __name__ == '__main__':
     unittest.main()

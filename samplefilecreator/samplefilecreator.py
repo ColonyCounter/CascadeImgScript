@@ -127,6 +127,9 @@ def create_samples(filenames, num, width, height, maxxangle, maxyangle, maxzangl
 
         subprocess.call(["opencv_createsamples", "-img", path_to_img, "-num", str(num), "-bg", path_to_bg, "-vec", vec_filename_path, "-w", str(width), "-h", str(height), "-maxxangle", str(maxxangle), "-maxyangle", str(maxyangle), "-maxzangle", str(maxzangle)])
 
+def merge_all_vecs(path, relative_path_to_vecs):
+    subprocess.call(["python", "mergevec/mergevec.py", "-v", path + relative_path_to_vecs, "-o", path + "out.vec"])
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(add_help=False, formatter_class=argparse.RawDescriptionHelpFormatter, description=textwrap.dedent('''\
         Directory structure:
@@ -204,3 +207,4 @@ if __name__ == "__main__":
             create_positive_file(path, relative_path, filenames)
 
         create_samples(filenames, args.num, width, height, args.maxxangle, args.maxyangle, args.maxzangle, path)
+        merge_all_vecs(path, "vec/")

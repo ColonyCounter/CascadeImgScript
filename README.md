@@ -2,7 +2,7 @@
 
 *samplefilecreator* is used to create the *bg.txt* and *info.data* files used by *opencv_createsamples*.
 It is also used to resize the positive images to a mean size or an user defined size, resized image are stored in a new dir called *pos_resized*.
-For creating samples it depends on [mergevec](https://github.com/thacoon/mergevec). Just download it and extract it to the CascadeImgScript folder. This is currently not build in!!! I still have to add it!!!
+For creating samples it depends on [mergevec](https://github.com/thacoon/mergevec). Just download it and extract it to the CascadeImgScript folder.
 
 Currently the script assumes the dir structure you see below.
 
@@ -76,7 +76,6 @@ $ python samplefilecreator/samplefilcreator.py -p PATH_TO_DIR -w WIDTH -h HEIGHT
 
 # Create samples from all images, currently the images need to be in the pos_resized dir
 # For all images opencv_createsamples is run and then they get merged in one vec file (dependencies: [mergevec](https://github.com/thacoon/mergevec))
-# Still have not added merging to one .vec file!!!
 $ python samplefilecreator/samplefilcreator.py -p PATH_TO_DIR --vec
 
 # Run the tests
