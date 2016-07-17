@@ -87,7 +87,7 @@ def get_mean_size(dir_path, filenames):
     return [round(mean_width), round(mean_height)]
 
 
-def resize_images(path, dir_path, filenames, new_size):
+def resize_images(path, filenames, new_size):
     print("[*] Resizing positive images...")
     print("\tNew size is:", new_size)
     # do not overwrite images, so create another dir where to save them if it does not exists
@@ -96,7 +96,7 @@ def resize_images(path, dir_path, filenames, new_size):
         os.makedirs(new_dir)
     # writes new images in pos_resized, only resizing positive images right now
     for filename in filenames:
-        img_path = dir_path + filename
+        img_path = path + "pos/" + filename
         img_new_path = new_dir + filename
         with Image.open(img_path) as img_in:
             img_out = img_in.resize(new_size)
@@ -152,9 +152,9 @@ if __name__ == "__main__":
     parser.add_argument("-m", "--mean", action="store_true", help="use mean size of old images for resized images")
     parser.add_argument("-v", "--vec", action="store_true", help="create a vec file of all pos images with using all neg images, mergevec.py needed")
     parser.add_argument("--num", nargs="?", default=100, type=int, help="number_of_samples, 100 is default")
-    parser.add_argument("-mx", "--maxxangle", nargs="?", default=0, type=float, help="max_x_rotation_angle, default is 1.0")
-    parser.add_argument("-my", "--maxyangle", nargs="?", default=0, type=float, help="max_y_rotation_angle, default is 1.0")
-    parser.add_argument("-mz", "--maxzangle", nargs="?", default=0, type=float, help="max_z_rotation_angle, default is 0.1")
+    parser.add_argument("-mx", "--maxxangle", nargs="?", default=1.0, type=float, help="max_x_rotation_angle, default is 1.0")
+    parser.add_argument("-my", "--maxyangle", nargs="?", default=1.0, type=float, help="max_y_rotation_angle, default is 1.0")
+    parser.add_argument("-mz", "--maxzangle", nargs="?", default=0.1, type=float, help="max_z_rotation_angle, default is 0.1")
 
     parser.print_help()
     args = parser.parse_args()
@@ -187,7 +187,7 @@ if __name__ == "__main__":
             height = resize_size[1]
 
     if ((width is not 0) and (height is not 0)):
-        resize_images(path, relative_path, filenames, (width, height))
+        resize_images(path, filenames, (width, height))
 
     relative_path = "pos_resized/"
 
