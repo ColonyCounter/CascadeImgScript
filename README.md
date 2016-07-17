@@ -2,7 +2,7 @@
 
 *samplefilecreator* is used to create the *bg.txt* and *info.data* files used by *opencv_createsamples*.
 It is also used to resize the positive images to a mean size or an user defined size, resized image are stored in a new dir called *pos_resized*.
-For creating samples it depends on [mergevec](https://github.com/thacoon/mergevec). Just download it and extract it to the CascadeImgScript folder.
+For creating samples it depends on [mergevec](https://github.com/thacoon/mergevec). Just download it and extract it to the CascadeImgScript folder. This is currently not build in!!! I still have to add it!!!
 
 Currently the script assumes the dir structure you see below.
 
@@ -58,24 +58,29 @@ optional arguments:
 
 ## Usage Examples
 ```bash
+# Assuming you're in the same folder as the README.md file
 # Generate the info.dat file in the same dir
-$ python samplefilcreator.py
+$ python samplefilecreator/samplefilcreator.py
 
 # Generate the info.dat file in a specific dir
-$ python samplefilcreator.py -p PATH_TO_DIR
+$ python samplefilecreator/samplefilcreator.py -p PATH_TO_DIR
 
 # Generate the bx.txt file in a specific dir
-$ python samplefilcreator.py -p PATH_TO_DIR --neg
+$ python samplefilecreator/samplefilcreator.py -p PATH_TO_DIR --neg
 
 # On default the dir is scanned for jpg images, set png flag to scan for png
-$ python samplefilcreator.py -p PATH_TO_DIR --png
+$ python samplefilecreator/samplefilcreator.py -p PATH_TO_DIR --png
 
 # Resize the images to a specific size, they are saved in pos_resized dir
-$ python samplefilcreator.py -p PATH_TO_DIR -w WIDTH -h HEIGHT
+$ python samplefilecreator/samplefilcreator.py -p PATH_TO_DIR -w WIDTH -h HEIGHT
 
 # Create samples from all images, currently the images need to be in the pos_resized dir
 # For all images opencv_createsamples is run and then they get merged in one vec file (dependencies: [mergevec](https://github.com/thacoon/mergevec))
-$ python samplefilcreator.py -p PATH_TO_DIR --vec
+# Still have not added merging to one .vec file!!!
+$ python samplefilecreator/samplefilcreator.py -p PATH_TO_DIR --vec
+
+# Run the tests
+$ python -m unittest test.test_samplefilecreator
 
 # For more info take a quick look at General Usage.
 ```

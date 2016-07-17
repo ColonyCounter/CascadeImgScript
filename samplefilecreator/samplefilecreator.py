@@ -84,7 +84,7 @@ def get_mean_size(dir_path, filenames):
     print("\tFloat:   ({}, {})".format(mean_width, mean_height))
     print("\tInteger: ({}, {})".format(round(mean_width), round(mean_height)))
 
-    return [round(mean_width), round(mean_height)]
+    return (round(mean_width), round(mean_height))
 
 
 def resize_images(path, filenames, new_size):
@@ -94,6 +94,7 @@ def resize_images(path, filenames, new_size):
     new_dir = path + "pos_resized/"
     if not os.path.exists(new_dir):
         os.makedirs(new_dir)
+
     # writes new images in pos_resized, only resizing positive images right now
     for filename in filenames:
         img_path = path + "pos/" + filename
@@ -101,13 +102,15 @@ def resize_images(path, filenames, new_size):
         with Image.open(img_path) as img_in:
             img_out = img_in.resize(new_size)
             img_out.save(img_new_path)
+            img_out.close()
+            # Tests say files are not closed here
 
     print("\tFinished resizing.")
 
 def create_samples(filenames, num, width, height, maxxangle, maxyangle, maxzangle, path):
     print("[*] Creating samples...")
     path_to_bg = path + "bg.txt"
-    path_to_vecs = path + "vec_files/"
+    path_to_vecs = path + "vec/"
 
     print("\tCurrent dir is:", path)
     print("\tChecking for vec dir:", path_to_vecs)
@@ -134,7 +137,7 @@ if __name__ == "__main__":
                 /pos
                     img1.jpg
                     img2.jpg
-                /vec_files
+                /vec
                     1.vec
                     2.vec
                     out.vec
@@ -147,9 +150,10 @@ if __name__ == "__main__":
     parser.add_argument("--png", action="store_true", help="file output is png")
     parser.add_argument("--neg", action="store_true", help="generate bg file for negative images")
     parser.add_argument("--pos", action="store_true", help="generate file for positive images (default)")
+    parser.add_argument("-r", "--resize", action="store_true", help="resize the image to a mean value on default or to a specific width and height")
     parser.add_argument("-w", "--width", nargs="?", default=0, type=int, help="width of resized images")
     parser.add_argument("-h", "--height", nargs="?", default=0, type=int, help="height of resized images")
-    parser.add_argument("-m", "--mean", action="store_true", help="use mean size of old images for resized images")
+    parser.add_argument("-m", "--mean", action="store_true", help="use mean size of old images for resized images (default)")
     parser.add_argument("-v", "--vec", action="store_true", help="create a vec file of all pos images with using all neg images, mergevec.py needed")
     parser.add_argument("--num", nargs="?", default=100, type=int, help="number_of_samples, 100 is default")
     parser.add_argument("-mx", "--maxxangle", nargs="?", default=1.0, type=float, help="max_x_rotation_angle, default is 1.0")
@@ -169,10 +173,7 @@ if __name__ == "__main__":
     if args.neg:
         dir_path = path + "neg/" # generate the bg file
     else:
-        if (width is 0) or (height is 0) or (not args.mean):
-            dir_path = path + "pos/" # generate the info.dat file
-        else:
-            dir_path = path + "pos_resized/"
+        dir_path = path + "pos/" # generate the info.dat file
 
     if args.png:
         filenames = get_all_png_files(dir_path)
@@ -180,16 +181,15 @@ if __name__ == "__main__":
         filenames = get_all_jpg_files(dir_path)
 
     # only resize positive images
-    if (width is 0) or (height is 0):
+    if args.resize:
         if args.mean:
             resize_size = get_mean_size(dir_path, filenames)
             width = resize_size[0]
             height = resize_size[1]
 
-    if ((width is not 0) and (height is not 0)):
         resize_images(path, filenames, (width, height))
 
-    relative_path = "pos_resized/"
+        relative_path = "pos_resized/"
 
     if args.neg:
         create_bg_file(path, filenames) # generate the bg file
@@ -197,4 +197,10 @@ if __name__ == "__main__":
         create_positive_file(path, relative_path, filenames) # generate the info.dat file
 
     if args.vec:
+        # Check if a bg.txt and info.dat file exists if not create one
+        if not os.path.isfile(path + "bg.txt"):
+            create_bg_file(path, filenames)
+        if not os.path.isfile(path + "info.dat"):
+            create_positive_file(path, relative_path, filenames)
+
         create_samples(filenames, args.num, width, height, args.maxxangle, args.maxyangle, args.maxzangle, path)
