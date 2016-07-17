@@ -9,11 +9,11 @@ Currently the script assumes the dir structure you see below.
 ## General Usage
 
 ```
-$ python samplefilecreator.py
+$ python samplefilecreator/samplefilecreator.py --help
 usage: samplefilecreator.py [--help] [-p [PATH]] [--jpg] [--png] [--neg]
-                            [--pos] [-w [WIDTH]] [-h [HEIGHT]] [-m] [-v]
+                            [--pos] [-r] [-w [WIDTH]] [-h [HEIGHT]] [-m] [-v]
                             [--num [NUM]] [-mx [MAXXANGLE]] [-my [MAXYANGLE]]
-                            [-mz [MAXZANGLE]]folder
+                            [-mz [MAXZANGLE]]
 
 Directory structure:
     /dir
@@ -23,12 +23,12 @@ Directory structure:
         /pos
             img1.jpg
             img2.jpg
-        /vec_files
+        /vec
             1.vec
             2.vec
-            out.vec
         bg.txt
         info.dat
+        out.vec
 
 optional arguments:
   --help                show this help message and exit
@@ -39,11 +39,14 @@ optional arguments:
   --png                 file output is png
   --neg                 generate bg file for negative images
   --pos                 generate file for positive images (default)
+  -r, --resize          resize the image to a mean value on default or to a
+                        specific width and height
   -w [WIDTH], --width [WIDTH]
                         width of resized images
   -h [HEIGHT], --height [HEIGHT]
                         height of resized images
   -m, --mean            use mean size of old images for resized images
+                        (default)
   -v, --vec             create a vec file of all pos images with using all neg
                         images, mergevec.py needed
   --num [NUM]           number_of_samples, 100 is default
@@ -53,6 +56,7 @@ optional arguments:
                         max_y_rotation_angle, default is 1.0
   -mz [MAXZANGLE], --maxzangle [MAXZANGLE]
                         max_z_rotation_angle, default is 0.1
+
 
 ```
 
@@ -72,11 +76,11 @@ $ python samplefilecreator/samplefilcreator.py -p PATH_TO_DIR --neg
 $ python samplefilecreator/samplefilcreator.py -p PATH_TO_DIR --png
 
 # Resize the images to a specific size, they are saved in pos_resized dir
-$ python samplefilecreator/samplefilcreator.py -p PATH_TO_DIR -w WIDTH -h HEIGHT
+$ python samplefilecreator/samplefilcreator.py -p PATH_TO_DIR -r -w WIDTH -h HEIGHT
 
-# Create samples from all images, currently the images need to be in the pos_resized dir
-# For all images opencv_createsamples is run and then they get merged in one vec file (dependencies: [mergevec](https://github.com/thacoon/mergevec))
-$ python samplefilecreator/samplefilcreator.py -p PATH_TO_DIR --vec
+# Create samples from all images that were resized to a mean value
+# For all images opencv_createsamples is run and then they get merged in one vec file (out.vec) (dependencies: [mergevec](https://github.com/thacoon/mergevec))
+$ python samplefilecreator/samplefilcreator.py -p PATH_TO_DIR -r -m --vec
 
 # Run the tests
 $ python -m unittest test.test_samplefilecreator
