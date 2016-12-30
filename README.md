@@ -9,6 +9,7 @@ Currently the script assumes the dir structure you see below.
 ## General Usage
 
 ```
+$ # The script is written for Python 3
 $ python samplefilecreator/samplefilecreator.py --help
 usage: samplefilecreator.py [--help] [-p [PATH]] [--jpg] [--png] [--neg]
                             [--pos] [-r] [-w [WIDTH]] [-h [HEIGHT]] [-m] [-v]
